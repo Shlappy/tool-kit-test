@@ -1,3 +1,14 @@
+@import url('bootstrap.css');
+@import url('button.css');
+@import url('nav.css');
+@import url('home-page.css');
+
+:root {
+    --bs-blue: #5552e8;
+    --bs-blue-hover: #3836b9;
+    --main: #212b31;
+}
+
 body {
-    background-color: skyblue;
+    background-color: #fff;
 }

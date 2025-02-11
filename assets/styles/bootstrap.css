@@ -1,0 +1,24 @@
+.form-floating>label {
+    padding: 0.7rem .75rem;
+}
+.row .form-floating>label {
+    left: .75rem;
+}
+.form-floating>.form-control {
+    height: calc(3rem + 2px);
+}
+
+.form-floating input[required="required"] + label:after {
+    content:"*";
+    position: absolute;
+    color: red;
+    top: 10px;
+    right: 3px;
+}
+.form-group input[required="required"] + label:after {
+    content:"*";
+    position: absolute;
+    color: red;
+    top: 10px;
+    right: 3px;
+}

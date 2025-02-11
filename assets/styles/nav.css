@@ -1,0 +1,25 @@
+.nav-filler {
+    margin-bottom: 100px;
+}
+
+.navbar-main {
+    background-color: var(--main) !important
+}
+.navbar-main .navbar-collapse {
+    margin-left: -8px;
+}
+.navbar-main .nav-item .nav-link {
+    color: #fff !important;
+}
+.navbar-main .profile-icon {
+    position: relative;
+}
+.navbar-main .profile-icon img {
+    filter: invert(1);
+    position: absolute;
+    top: 2px;
+    height: 36px;
+    min-height: 36px;
+    min-width: 36px;
+    width: 36px;
+}

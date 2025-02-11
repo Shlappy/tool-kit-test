@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Главная{% endblock %}
+
+{% block body %}
+    {% if is_granted('ROLE_CLIENT') %}
+        <div class="home-blocks">
+            <div class="home-blocks__item home-blocks__upper">
+                <h1>Отправьте заявление для рассмотрения</h1>
+                <a class="btn btn-primary" href="#">Отправить заявление</a>
+            </div>
+            <div class="home-blocks__item home-blocks__bottom">
+                <h1>Мои заявления</h1>
+                <a class="btn btn-primary" href="#">Просмотр</a>
+            </div>
+        </div>
+    {% elseif is_granted('ROLE_ADMIN') %}
+        <div class="home-blocks">
+            <div class="home-blocks__item">
+                <h1>Просмотреть список заявлений</h1>
+                <a class="btn btn-primary" href="#">Заявление</a>
+            </div>
+        </div>
+    {% else %}
+        <div class="home-blocks">
+            <div class="home-blocks__item home-blocks__upper">
+                <h1>Заполните анкету для подачи заявлений</h1>
+                <a class="btn btn-primary" href="{{ path('app_register') }}">Заполнить анкету</a>
+            </div>
+            <div class="home-blocks__item home-blocks__bottom">
+                <h1>Или войдите в Вашу учетную запись</h1>
+                <a class="btn btn-primary btn-login" href="{{ path('app_login') }}">Войти</a>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

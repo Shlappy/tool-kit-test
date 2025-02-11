@@ -17,19 +17,42 @@ ifneq ($(INTERACTIVE), 1)
 	OPTION_T := -T
 endif
 
-start: ## Build dev environment
+load-prod-env:
+	$(eval include .env.prod)
+
+build-start: ## Build dev environment
 ifeq ($(INSIDE_DOCKER_CONTAINER), 0)
 	@HOST_UID=$(HOST_UID) HOST_GID=$(HOST_GID) WEB_PORT_HTTP=$(WEB_PORT_HTTP) WEB_PORT_SSL=$(WEB_PORT_SSL) POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) POSTGRES_PORT=$(POSTGRES_PORT) docker compose -f compose.yaml build
 	@HOST_UID=$(HOST_UID) HOST_GID=$(HOST_GID) WEB_PORT_HTTP=$(WEB_PORT_HTTP) WEB_PORT_SSL=$(WEB_PORT_SSL) POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) POSTGRES_PORT=$(POSTGRES_PORT) docker compose -f compose.yaml $(PROJECT_NAME) up -d
 	@make exec-bash cmd="COMPOSER_MEMORY_LIMIT=-1 composer install --optimize-autoloader"
+	@make initialize-program
+else
+	$(ERROR_ONLY_FOR_HOST)
+endif
+
+start: ## Build dev environment
+ifeq ($(INSIDE_DOCKER_CONTAINER), 0)
+	@HOST_UID=$(HOST_UID) HOST_GID=$(HOST_GID) WEB_PORT_HTTP=$(WEB_PORT_HTTP) WEB_PORT_SSL=$(WEB_PORT_SSL) POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) POSTGRES_PORT=$(POSTGRES_PORT) docker compose -f compose.yaml $(PROJECT_NAME) up -d
+	@make exec-bash cmd="COMPOSER_MEMORY_LIMIT=-1 composer install --optimize-autoloader"
+	@make initialize-program
+else
+	$(ERROR_ONLY_FOR_HOST)
+endif
+
+build-start-prod: load-prod-env ## Build prod environment
+ifeq ($(INSIDE_DOCKER_CONTAINER), 0)
+	@HOST_UID=$(HOST_UID) HOST_GID=$(HOST_GID) WEB_PORT_HTTP=$(WEB_PORT_HTTP) WEB_PORT_SSL=$(WEB_PORT_SSL) POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) POSTGRES_PORT=$(POSTGRES_PORT) docker compose -f compose-prod.yaml build
+	@HOST_UID=$(HOST_UID) HOST_GID=$(HOST_GID) WEB_PORT_HTTP=$(WEB_PORT_HTTP) WEB_PORT_SSL=$(WEB_PORT_SSL) POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) POSTGRES_PORT=$(POSTGRES_PORT) docker compose -f compose-prod.yaml $(PROJECT_NAME) up -d
+	@make initialize-program
+	@make exec cmd="php bin/console asset-map:compile"
 else
 	$(ERROR_ONLY_FOR_HOST)
 endif
 
 start-prod: load-prod-env ## Build prod environment
 ifeq ($(INSIDE_DOCKER_CONTAINER), 0)
-	@HOST_UID=$(HOST_UID) HOST_GID=$(HOST_GID) WEB_PORT_HTTP=$(WEB_PORT_HTTP) WEB_PORT_SSL=$(WEB_PORT_SSL) POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) POSTGRES_PORT=$(POSTGRES_PORT) docker compose -f compose-prod.yaml build
 	@HOST_UID=$(HOST_UID) HOST_GID=$(HOST_GID) WEB_PORT_HTTP=$(WEB_PORT_HTTP) WEB_PORT_SSL=$(WEB_PORT_SSL) POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) POSTGRES_PORT=$(POSTGRES_PORT) docker compose -f compose-prod.yaml $(PROJECT_NAME) up -d
+	@make initialize-program
 else
 	$(ERROR_ONLY_FOR_HOST)
 endif
@@ -51,9 +74,13 @@ endif
 restart: stop start ## Stop and start dev environment
 restart-prod: stop-prod start-prod ## Stop and start prod environment
 
+initialize-program: ## Initialize program by running required commands
+	@make exec cmd="php bin/console lexik:jwt:generate-keypair --skip-if-exists"
+	@make migrate
+
 migrate: ## Runs all migrations for main/test databases
 	@make exec cmd="php bin/console doctrine:migrations:migrate --no-interaction"
-	@make exec cmd="php bin/console doctrine:migrations:migrate --no-interaction --env=test"
+## @make exec cmd="php bin/console doctrine:migrations:migrate --no-interaction --env=test"
 
 fixtures: ## Runs all fixtures for test database without --append option (tables will be dropped and recreated)
 	@make exec cmd="php bin/console doctrine:fixtures:load --env=test"

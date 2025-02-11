@@ -1,0 +1,26 @@
+.home-blocks {
+    margin-top: -56px;
+}
+.home-blocks .home-blocks__item {
+    margin-top: 100px;
+    text-align: center;
+}
+.home-blocks .home-blocks__item:first-of-type {
+    margin-top: 0;
+}
+.home-blocks .home-blocks__item.home-blocks__upper {
+    padding: 110px 0;
+    background-color: var(--main);
+    color: white;
+}
+.home-blocks .home-blocks__item.home-blocks__upper .btn{
+    font-size: 1.2rem;
+    padding: 10px 50px;
+}
+.home-blocks .home-blocks__item.home-blocks__bottom .btn-login {
+    font-size: 1.2rem;
+    padding: 10px 50px;
+}
+.home-blocks .home-blocks__item h1 {
+    margin-bottom: 40px;
+}

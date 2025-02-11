@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Анкета{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h2 class="mb-4">Анкета</h2>
+
+        {{ form_errors(registrationForm) }}
+
+        {{ form_start(registrationForm) }}
+            <div class="row">
+                {{ form_row(registrationForm.email) }}
+                {{ form_row(registrationForm.plainPassword, {
+                    label: 'Пароль'
+                }) }}
+                {{ form_row(registrationForm.fullName) }}
+                {{ form_row(registrationForm.birthDate) }}
+            </div>
+            {{ form_row(registrationForm.address) }}
+            <div class="row">
+                {{ form_row(registrationForm.phone) }}
+            </div>
+            {{ form_row(registrationForm.agreeTerms, {
+                label: 'Согласен на обработку персональных данных'
+            }) }}
+
+            <button type="submit" class="btn btn-primary">Отправить</button>
+        {{ form_end(registrationForm) }}
+    </div>
+{% endblock %}
