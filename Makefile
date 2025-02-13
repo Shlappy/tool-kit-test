@@ -30,11 +30,10 @@ else
 	$(ERROR_ONLY_FOR_HOST)
 endif
 
-start: ## Build dev environment
+start: ## Start dev environment
 ifeq ($(INSIDE_DOCKER_CONTAINER), 0)
 	@HOST_UID=$(HOST_UID) HOST_GID=$(HOST_GID) WEB_PORT_HTTP=$(WEB_PORT_HTTP) WEB_PORT_SSL=$(WEB_PORT_SSL) POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) POSTGRES_PORT=$(POSTGRES_PORT) docker compose -f compose.yaml $(PROJECT_NAME) up -d
 	@make exec-bash cmd="COMPOSER_MEMORY_LIMIT=-1 composer install --optimize-autoloader"
-	@make initialize-program
 else
 	$(ERROR_ONLY_FOR_HOST)
 endif
@@ -45,14 +44,14 @@ ifeq ($(INSIDE_DOCKER_CONTAINER), 0)
 	@HOST_UID=$(HOST_UID) HOST_GID=$(HOST_GID) WEB_PORT_HTTP=$(WEB_PORT_HTTP) WEB_PORT_SSL=$(WEB_PORT_SSL) POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) POSTGRES_PORT=$(POSTGRES_PORT) docker compose -f compose-prod.yaml $(PROJECT_NAME) up -d
 	@make initialize-program
 	@make exec cmd="php bin/console asset-map:compile"
+	@make fixtures-prod
 else
 	$(ERROR_ONLY_FOR_HOST)
 endif
 
-start-prod: load-prod-env ## Build prod environment
+start-prod: load-prod-env ## Start prod environment
 ifeq ($(INSIDE_DOCKER_CONTAINER), 0)
 	@HOST_UID=$(HOST_UID) HOST_GID=$(HOST_GID) WEB_PORT_HTTP=$(WEB_PORT_HTTP) WEB_PORT_SSL=$(WEB_PORT_SSL) POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) POSTGRES_PORT=$(POSTGRES_PORT) docker compose -f compose-prod.yaml $(PROJECT_NAME) up -d
-	@make initialize-program
 else
 	$(ERROR_ONLY_FOR_HOST)
 endif
@@ -82,8 +81,11 @@ migrate: ## Runs all migrations for main/test databases
 	@make exec cmd="php bin/console doctrine:migrations:migrate --no-interaction"
 ## @make exec cmd="php bin/console doctrine:migrations:migrate --no-interaction --env=test"
 
-fixtures: ## Runs all fixtures for test database without --append option (tables will be dropped and recreated)
-	@make exec cmd="php bin/console doctrine:fixtures:load --env=test"
+
+fixtures-prod:
+	@make exec cmd="php bin/console doctrine:fixtures:load --group=prod --no-interaction"
+fixtures-dev:
+	@make exec cmd="php bin/console doctrine:fixtures:load --group=dev --no-interaction"
 
 phpunit: ## Runs PhpUnit tests
 	@make exec-bash cmd="rm -rf ./var/cache/test* && bin/console cache:warmup --env=test && ./vendor/bin/phpunit -c phpunit.xml.dist --coverage-html reports/coverage $(PHPUNIT_OPTIONS) --coverage-clover reports/clover.xml --log-junit reports/junit.xml"
