@@ -13,7 +13,7 @@ class File extends BaseEntity
     #[ORM\Column(type: Types::TEXT)]
     private ?string $name = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $creator = null;
 
@@ -34,7 +34,7 @@ class File extends BaseEntity
         return $this->creator;
     }
 
-    public function setCreator(UserInterface $creator): static
+    public function setCreator(?User $creator): static
     {
         $this->creator = $creator;
 

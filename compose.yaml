@@ -59,6 +59,52 @@ services:
         networks:
             - symfony
 
+    redis:
+        image: redis:latest
+        container_name: redis
+        environment:
+            - REDIS_PASSWORD=${REDIS_PASSWORD}
+            - REDIS_USER=${REDIS_USER}
+            - REDIS_USER_PASSWORD=${REDIS_USER_PASSWORD}
+        ports:
+            - "6379:6379"
+        volumes:
+            - ./var/redisdata:/data
+        command: >
+            sh -c '
+                mkdir -p /usr/local/etc/redis &&
+                echo "bind 0.0.0.0" > /usr/local/etc/redis/redis.conf &&
+                echo "requirepass $REDIS_PASSWORD" >> /usr/local/etc/redis/redis.conf &&
+                echo "appendonly yes" >> /usr/local/etc/redis/redis.conf &&
+                echo "appendfsync everysec" >> /usr/local/etc/redis/redis.conf &&
+                echo "user default on nopass ~* +@all" > /usr/local/etc/redis/users.acl &&
+                echo "user $REDIS_USER on >$REDIS_USER_PASSWORD ~* +@all" >> /usr/local/etc/redis/users.acl &&
+                redis-server /usr/local/etc/redis/redis.conf --aclfile /usr/local/etc/redis/users.acl
+            '
+        restart: unless-stopped
+        tty: true
+        stdin_open: true
+        networks:
+            - symfony
+
+    phpRedisAdmin:
+        image: erikdubbelboer/phpredisadmin
+        container_name: phpRedisAdmin
+        restart: unless-stopped
+        environment:
+            - ADMIN_USER=admin
+            - ADMIN_PASS=admin
+            - REDIS_1_HOST=redis
+            - REDIS_1_PORT=6379
+        links:
+            - redis
+        depends_on:
+            - redis
+        ports:
+            - "8085:80"
+        networks:
+            - symfony
+
 networks:
     symfony:
         name: symfony

@@ -4,6 +4,7 @@ namespace App\Controller\View;
 
 use App\Controller\BaseController;
 use App\Entity\Statement;
+use App\Enum\CacheKeys;
 use App\Form\StatementCreateType;
 use App\Service\FileUploader;
 use App\Service\Pagination\StatementPagination;
@@ -13,13 +14,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route(path: '/statements')]
 class StatementController extends BaseController
 {
     /**
      * Страница с формой создания заявления
      */
-    #[Route(path: '/create', name: 'create_statement')]
+    #[Route(path: '/statements/create', name: 'create_statement')]
     public function create(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -51,17 +51,19 @@ class StatementController extends BaseController
     /**
      * Страница со списком заявлений
      */
-    #[Route(path: '/list', name: 'statement_list')]
+    #[Route(path: '/statements/list', name: 'statement_list')]
     public function list(
         Request $request,
         StatementPagination $statementPagination
     ): Response
     {
-        $statementPagination->setUser($this->getUser());
         $page = (int)$request->get('page');
+        $statementPagination
+            ->init('statement_list', $page)
+            ->setUser($this->getUser());
 
         return $this->render('views/statement/list.html.twig', [
-            'statements' => $statementPagination->getResult('statement_list', $page)['items'],
+            'statements' => $statementPagination->getResult()['items'],
             'pagination' => $statementPagination->getLinks(),
         ]);
     }
@@ -69,16 +71,19 @@ class StatementController extends BaseController
     /**
      * Страница со списком заявлений для администратора
      */
-    #[Route(path: '/admin/list', name: 'statement_list_admin')]
+    #[Route(path: '/admin/statements/list', name: 'statement_list_admin')]
     public function listForAdmin(
         Request $request,
         StatementPagination $statementPagination
     ): Response
     {
         $page = (int)$request->get('page');
+        $statementPagination
+            ->init('statement_list_admin', $page)
+            ->setCache(CacheKeys::ADMIN_STATEMENT_LIST->value, 5);
 
         return $this->render('views/statement/list-admin.html.twig', [
-            'statements' => $statementPagination->getResult('statement_list_admin', $page)['items'],
+            'statements' => $statementPagination->getResult()['items'],
             'pagination' => $statementPagination->getLinks(),
         ]);
     }

@@ -29,8 +29,8 @@ services:
         resource: '../src/Controller/'
         tags: ['controller.service_arguments']
 
-    App\Service\Interfaces\MessageServiceInterface:
-        class: App\Service\MessageService
+    App\Service\Cache\AppCacheInterface:
+        class: App\Service\Cache\PredisStore
 
     App\Service\FileUploader:
         arguments:

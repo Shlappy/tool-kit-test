@@ -25,6 +25,7 @@
 		"doctrine/orm": "^2.20.1",
 		"lexik/jwt-authentication-bundle": "*",
 		"phpdocumentor/reflection-docblock": "^5.6.1",
+		"predis/predis": "^2.3",
 		"symfony/asset": "7.2.*",
 		"symfony/asset-mapper": "7.2.*",
 		"symfony/config": "7.2.*",

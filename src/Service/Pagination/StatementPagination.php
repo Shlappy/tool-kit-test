@@ -4,6 +4,7 @@ namespace App\Service\Pagination;
 
 use App\Entity\Statement;
 use App\Entity\User;
+use App\Service\Cache\AppCacheInterface;
 use App\Service\Pagination\PagePaginator;
 use App\Service\Pagination\PaginationLinks;
 use Doctrine\ORM\EntityManagerInterface;
@@ -12,9 +13,34 @@ use Symfony\Component\Routing\RouterInterface;
 final class StatementPagination
 {
     /**
-     * @var string Строка с ссылками пагинации
+     * @var bool Нужно ли кешировать полученный результат
      */
-    private string $pagination;
+    private bool $shouldCache = false;
+
+    /**
+     * @var string Путь, для которого создаются ссылки
+     */
+    private string $route;
+
+    /**
+     * @var int Текущая страница
+     */
+    private int $page = 1;
+
+    /**
+     * @var string|null Ключ для кеширования
+     */
+    private ?string $cacheKey = null;
+
+    /**
+     * @var int|null Время кеширования
+     */
+    private ?int $cacheTimeInMin = null;
+
+    /**
+     * @var array|null Результат пагинации
+     */
+    private ?array $paginatedResult = null;
 
     /**
      * @var User|null Пользователь, заявления которого будут отображены.
@@ -26,7 +52,8 @@ final class StatementPagination
         private PagePaginator $paginator,
         private PaginationLinks $paginationLinks,
         private EntityManagerInterface $entityManager,
-        private RouterInterface $router
+        private RouterInterface $router,
+        private AppCacheInterface $cache
     ) {
         $this->paginator = $paginator;
         $this->paginationLinks = $paginationLinks;
@@ -35,16 +62,33 @@ final class StatementPagination
     }
 
     /**
-     * Данные после запроса с пагинацией
-     *
-     * @param string $route
-     * @param int|null $page
+     * Данные запроса с пагинацией с кешированием результата запроса
+
      * @return array
      */
-    public function getResult(string $route, ?int $page = 1): array
+    public function getResult(): array
     {
-        $builder = $this->entityManager->getRepository(Statement::class)
+        if ($this->shouldCache) {
+            $this->paginatedResult = $this->getFromCache();
+        } else {
+            $this->paginatedResult = $this->fetchData();
+        }
+
+        return $this->paginatedResult;
+    }
+
+    /**
+     * Данные запроса с пагинацией напрямую из БД, без кеширования результата запроса
+     *
+     * @return array
+     */
+    private function fetchData(): array
+    {
+        $builder = $this->entityManager
+            ->getRepository(Statement::class)
             ->createQueryBuilder('s')
+            ->addSelect('u')
+            ->leftJoin('s.creator', 'u')
             ->orderBy('s.id', 'desc');
 
         if ($this->user) {
@@ -52,20 +96,49 @@ final class StatementPagination
                 ->setParameter('creator', $this->user);
         }
 
-        $paginatedStatements = $this->paginator->paginate($builder, $page ?: 1);
+        $this->paginatedResult = $this->paginator->paginate($builder, $this->page ?: 1);
 
-        $this->pagination = $this->paginationLinks->generateLinks(
-            $paginatedStatements['pages'],
-            $paginatedStatements['page'],
-            $this->router->generate($route)
-        );
-
-        return $paginatedStatements;
+        return $this->paginatedResult;
     }
 
     public function getLinks(): string
     {
-        return $this->pagination;
+        return $this->paginationLinks->generateLinks(
+            $this->paginatedResult['pages'],
+            $this->paginatedResult['page'],
+            $this->router->generate($this->route)
+        );
+    }
+
+    /**
+     * Возвращает закешированный результат
+     *
+     * @return array
+     */
+    public function getFromCache(): array
+    {
+        $key = "$this->cacheKey:$this->page";
+        $ttl = $this->cacheTimeInMin * 60;
+
+        return $this->cache->remember($key, $ttl, function () {
+            return $this->fetchData();
+        });
+    }
+
+    /**
+     * Задаёт кеширование результата выполнения запроса для сокращения запросов в БД
+     *
+     * @param string $key Ключ для кеширования
+     * @param int $timeInMin Время в минутах
+     * @return static
+     */
+    public function setCache(string $key, int $timeInMin = 5): static
+    {
+        $this->cacheKey = $key;
+        $this->cacheTimeInMin = $timeInMin;
+        $this->shouldCache = true;
+
+        return $this;
     }
 
     /**
@@ -77,6 +150,20 @@ final class StatementPagination
     public function setUser(?User $user = null): static
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * Инициализация требуемых полей
+     * 
+     * @param string $route
+     * @param int|null $page
+     */
+    public function init(string $route, int $page = 1): static
+    {
+        $this->route = $route;
+        $this->page = $page ?: 1;
 
         return $this;
     }
