@@ -3,6 +3,7 @@
 namespace App\EventListener;
 
 use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTInvalidEvent;
+use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTNotFoundEvent;
 use Lexik\Bundle\JWTAuthenticationBundle\Events;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -20,8 +21,9 @@ final class AuthenticationEventListener
         $this->router = $router;
     }
 
+    #[AsEventListener(Events::JWT_NOT_FOUND)]
     #[AsEventListener(Events::JWT_INVALID)]
-    public function onJWTInvalidEvent(JWTInvalidEvent $event): void
+    public function onJWTInvalidEvent(mixed $event): void
     {
         $event->setResponse(new RedirectResponse($this->router->generate('home')));
         // Очистка токена из куки браузера

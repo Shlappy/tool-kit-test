@@ -1,0 +1,7 @@
+.statements-table .download-file {
+    position: relative;
+}
+.statements-table .download-file .file-image {
+    width: 36px;
+    height: 36px;
+}

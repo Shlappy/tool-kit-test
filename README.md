@@ -23,7 +23,7 @@ http://localhost:port
 где port - уканный в .env порт.
 
 #### Для входа за админа:
-Логин - admin<br>
+Логин - admin@mail.ru<br>
 Пароль - admin
 
 ---

@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Заявление{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h2 class="mb-4">Заявление</h2>
+
+        {{ form_errors(form) }}
+
+        {{ form_start(form) }}
+            <div class="row">
+                {{ form_row(form.number) }}
+                {{ form_row(form.fullName) }}
+                {{ form_row(form.date) }}
+            </div>
+            <div class="row">
+                {{ form_row(form.typeId) }}
+                {{ form_row(form.phone) }}
+            </div>
+            {{ form_row(form.comment) }}
+            <div class="row">
+                {{ form_row(form.file) }}
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-3">Отправить</button>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

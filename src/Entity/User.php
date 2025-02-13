@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\DBAL\Types\Types;
 use App\Enum\Roles;
@@ -44,6 +46,17 @@ class User extends BaseEntity implements UserInterface, PasswordAuthenticatedUse
 
     #[ORM\Column(nullable: true)]
     private ?string $phone;
+
+    /**
+     * @var Collection<int, Statement>
+     */
+    #[ORM\OneToMany(mappedBy: 'creator', targetEntity: Statement::class)]
+    private Collection $statements;
+
+    public function __construct()
+    {
+        $this->statements = new ArrayCollection();
+    }
 
     public function getEmail(): ?string
     {
@@ -183,5 +196,35 @@ class User extends BaseEntity implements UserInterface, PasswordAuthenticatedUse
     public function getPhone(): string
     {
         return $this->phone;
+    }
+
+    /**
+     * @return Collection<int, Statement>
+     */
+    public function getStatements(): Collection
+    {
+        return $this->statements;
+    }
+
+    public function addStatement(Statement $statement): static
+    {
+        if (!$this->statements->contains($statement)) {
+            $this->statements->add($statement);
+            $statement->setCreator($this);
+        }
+
+        return $this;
+    }
+
+    public function removeStatement(Statement $statement): static
+    {
+        if ($this->statements->removeElement($statement)) {
+            // set the owning side to null (unless already changed)
+            if ($statement->getCreator() === $this) {
+                $statement->setCreator(null);
+            }
+        }
+
+        return $this;
     }
 }

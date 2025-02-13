@@ -2,6 +2,8 @@
 @import url('button.css');
 @import url('nav.css');
 @import url('home-page.css');
+@import url('pagination.css');
+@import url('statements.css');
 
 :root {
     --bs-blue: #5552e8;
@@ -11,4 +13,5 @@
 
 body {
     background-color: #fff;
+    letter-spacing: 0.03rem;
 }

@@ -7,20 +7,22 @@
         <div class="home-blocks">
             <div class="home-blocks__item home-blocks__upper">
                 <h1>Отправьте заявление для рассмотрения</h1>
-                <a class="btn btn-primary" href="#">Отправить заявление</a>
+                <a class="btn btn-primary" href="{{ path('create_statement') }}">Отправить заявление</a>
             </div>
             <div class="home-blocks__item home-blocks__bottom">
                 <h1>Мои заявления</h1>
-                <a class="btn btn-primary" href="#">Просмотр</a>
+                <a class="btn btn-primary btn-home" href="{{ path('statement_list') }}">Просмотр</a>
             </div>
         </div>
+
     {% elseif is_granted('ROLE_ADMIN') %}
         <div class="home-blocks">
-            <div class="home-blocks__item">
+            <div class="home-blocks__item home-blocks__upper">
                 <h1>Просмотреть список заявлений</h1>
-                <a class="btn btn-primary" href="#">Заявление</a>
+                <a class="btn btn-primary btn-home" href="#">Заявление</a>
             </div>
         </div>
+
     {% else %}
         <div class="home-blocks">
             <div class="home-blocks__item home-blocks__upper">
@@ -29,7 +31,7 @@
             </div>
             <div class="home-blocks__item home-blocks__bottom">
                 <h1>Или войдите в Вашу учетную запись</h1>
-                <a class="btn btn-primary btn-login" href="{{ path('app_login') }}">Войти</a>
+                <a class="btn btn-primary btn-home" href="{{ path('app_login') }}">Войти</a>
             </div>
         </div>
     {% endif %}
