@@ -58,9 +58,27 @@ class StatementController extends BaseController
     ): Response
     {
         $statementPagination->setUser($this->getUser());
+        $page = (int)$request->get('page');
 
         return $this->render('views/statement/list.html.twig', [
-            'statements' => $statementPagination->getResult((int)$request->get('page'))['items'],
+            'statements' => $statementPagination->getResult('statement_list', $page)['items'],
+            'pagination' => $statementPagination->getLinks(),
+        ]);
+    }
+
+    /**
+     * Страница со списком заявлений для администратора
+     */
+    #[Route(path: '/admin/list', name: 'statement_list_admin')]
+    public function listForAdmin(
+        Request $request,
+        StatementPagination $statementPagination
+    ): Response
+    {
+        $page = (int)$request->get('page');
+
+        return $this->render('views/statement/list-admin.html.twig', [
+            'statements' => $statementPagination->getResult('statement_list_admin', $page)['items'],
             'pagination' => $statementPagination->getLinks(),
         ]);
     }

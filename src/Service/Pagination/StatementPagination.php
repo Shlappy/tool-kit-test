@@ -17,10 +17,10 @@ final class StatementPagination
     private string $pagination;
 
     /**
-     * @var ?User Пользователь, заявления которого будут отображены.
+     * @var User|null Пользователь, заявления которого будут отображены.
      * Если не задано, будут отображены все заявления.
      */
-    private ?User $user;
+    private ?User $user = null;
 
     public function __construct(
         private PagePaginator $paginator,
@@ -37,10 +37,11 @@ final class StatementPagination
     /**
      * Данные после запроса с пагинацией
      *
+     * @param string $route
      * @param int|null $page
      * @return array
      */
-    public function getResult(?int $page = 1): array
+    public function getResult(string $route, ?int $page = 1): array
     {
         $builder = $this->entityManager->getRepository(Statement::class)
             ->createQueryBuilder('s')
@@ -56,7 +57,7 @@ final class StatementPagination
         $this->pagination = $this->paginationLinks->generateLinks(
             $paginatedStatements['pages'],
             $paginatedStatements['page'],
-            $this->router->generate('statement_list')
+            $this->router->generate($route)
         );
 
         return $paginatedStatements;
