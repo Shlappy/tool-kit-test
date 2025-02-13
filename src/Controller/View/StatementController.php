@@ -9,6 +9,8 @@ use App\Form\StatementCreateType;
 use App\Service\FileUploader;
 use App\Service\Pagination\StatementPagination;
 use Doctrine\ORM\EntityManagerInterface;
+use Nelmio\ApiDocBundle\Attribute\Security as OASecurity;
+use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,9 +19,21 @@ use Symfony\Component\Routing\Annotation\Route;
 class StatementController extends BaseController
 {
     /**
-     * Страница с формой создания заявления
+     * Страница с формой создания заявления.
+     * GET  - страница с формой
+     * POST - отправка данных для создания заявления
      */
-    #[Route(path: '/statements/create', name: 'create_statement')]
+    #[Route(path: '/statements/create', name: 'create_statement', methods: ['GET', 'POST'])]
+    #[OA\Response(
+        response: 200,
+        description: 'Страница с формой создания заявления'
+    )]
+    #[OA\Response(
+        response: 422,
+        description: 'Неверные данные'
+    )]
+    #[OA\Tag(name: 'Заявление')]
+    #[OASecurity(name: 'Bearer')]
     public function create(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -51,7 +65,13 @@ class StatementController extends BaseController
     /**
      * Страница со списком заявлений
      */
-    #[Route(path: '/statements/list', name: 'statement_list')]
+    #[Route(path: '/statements/list', name: 'statement_list', methods: ['GET'])]
+    #[OA\Response(
+        response: 200,
+        description: 'Страница со списком заявлений'
+    )]
+    #[OA\Tag(name: 'Заявление')]
+    #[OASecurity(name: 'Bearer')]
     public function list(
         Request $request,
         StatementPagination $statementPagination
@@ -71,7 +91,13 @@ class StatementController extends BaseController
     /**
      * Страница со списком заявлений для администратора
      */
-    #[Route(path: '/admin/statements/list', name: 'statement_list_admin')]
+    #[Route(path: '/admin/statements/list', name: 'statement_list_admin', methods: ['GET'])]
+    #[OA\Response(
+        response: 200,
+        description: 'Страница со списком заявлений для администратора'
+    )]
+    #[OA\Tag(name: 'Заявление')]
+    #[OASecurity(name: 'Bearer')]
     public function listForAdmin(
         Request $request,
         StatementPagination $statementPagination

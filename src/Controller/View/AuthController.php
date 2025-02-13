@@ -8,6 +8,8 @@ use App\Enum\Roles;
 use App\Form\LoginFormType;
 use App\Form\RegistrationFormType;
 use Doctrine\ORM\EntityManagerInterface;
+use Nelmio\ApiDocBundle\Attribute\Security as OASecurity;
+use OpenApi\Attributes as OA;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormError;
@@ -21,17 +23,26 @@ use Symfony\Component\Security\Http\Event\LogoutEvent;
 
 class AuthController extends BaseController
 {
-    private Security $security;
-
-    public function __construct(Security $security)
+    public function __construct(private Security $security)
     {
-        $this->security = $security;
     }
 
     /**
-     * Регистрация клиентов
+     * Регистрация клиентов.
+     * GET  - страница с формой.
+     * POST - отправка данных для регистрации.
      */
-    #[Route('/users/register', name: 'app_register')]
+    #[Route('/auth/register', name: 'app_register', methods: ['GET', 'POST'])]
+    #[OA\Response(
+        response: 200,
+        description: 'Регистрация клиентов'
+    )]
+    #[OA\Response(
+        response: 422,
+        description: 'Неверные данные'
+    )]
+    #[OA\Tag(name: 'Пользователи')]
+    #[OASecurity(name: 'Bearer')]
     public function register(
         Request $request,
         UserPasswordHasherInterface $userPasswordHasher,
@@ -61,9 +72,21 @@ class AuthController extends BaseController
     }
 
     /**
-     * Вход в профиль
+     * Вход в профиль.
+     * GET  - страница с формой.
+     * POST - отправка данных для входа.
      */
-    #[Route('/login', name: 'app_login')]
+    #[Route('/auth/login', name: 'app_login', methods: ['GET', 'POST'])]
+    #[OA\Response(
+        response: 200,
+        description: 'Вход в профиль'
+    )]
+    #[OA\Response(
+        response: 422,
+        description: 'Неверные данные'
+    )]
+    #[OA\Tag(name: 'Пользователи')]
+    #[OASecurity(name: 'Bearer')]
     public function login(
         Request $request,
         UserPasswordHasherInterface $userPasswordHasher,
@@ -96,7 +119,13 @@ class AuthController extends BaseController
     /**
      * Выход из профиля
      */
-    #[Route(path: '/logout', name: 'app_logout')]
+    #[Route(path: '/auth/logout', name: 'app_logout', methods: ['GET'])]
+    #[OA\Response(
+        response: 200,
+        description: 'Выход из профиля'
+    )]
+    #[OA\Tag(name: 'Пользователи')]
+    #[OASecurity(name: 'Bearer')]
     public function logout(
         Request $request,
         EventDispatcherInterface $eventDispatcher,

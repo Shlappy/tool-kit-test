@@ -11,7 +11,7 @@ class HomeController extends BaseController
     /**
      * Главная страница
      */
-    #[Route(path: '/', name: 'home')]
+    #[Route(path: '/', name: 'home', methods: ['GET'])]
     public function index(): Response
     {
         return $this->render('views/home.html.twig');

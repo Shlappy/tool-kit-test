@@ -55,10 +55,6 @@ final class StatementPagination
         private RouterInterface $router,
         private AppCacheInterface $cache
     ) {
-        $this->paginator = $paginator;
-        $this->paginationLinks = $paginationLinks;
-        $this->entityManager = $entityManager;
-        $this->router = $router;
     }
 
     /**
