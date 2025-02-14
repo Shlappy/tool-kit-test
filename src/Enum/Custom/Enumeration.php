@@ -30,7 +30,7 @@ abstract class Enumeration
      */
     public static function getByArrId(int $id): array
     {
-        return static::getByArrKey('id', $id);
+        return self::getByArrKey('id', $id);
     }
 
     /**
@@ -42,7 +42,7 @@ abstract class Enumeration
      */
     public static function getByArrSlug(string $slug): array
     {
-        return static::getByArrKey('slug', $slug);
+        return self::getByArrKey('slug', $slug);
     }
 
     /**
@@ -57,7 +57,7 @@ abstract class Enumeration
      */
     public static function getByArrKey(string $key, $value): array
     {
-        $allEnums = static::getAll();
+        $allEnums = self::getAll();
 
         $arrayKey = array_search($value, array_column($allEnums, $key));
 
@@ -81,7 +81,7 @@ abstract class Enumeration
     {
         if (in_array($value, [null, ''], true)) return null;
 
-        $allEnums = static::getAll();
+        $allEnums = self::getAll();
 
         $arrayKey = array_search($value, array_column($allEnums, $key));
 
@@ -95,7 +95,7 @@ abstract class Enumeration
      */
     public static function getAllIds(): array
     {
-        return array_column(static::getAll(), 'id');
+        return array_column(self::getAll(), 'id');
     }
 
     /**
@@ -105,20 +105,20 @@ abstract class Enumeration
      */
     public static function getAll(): array
     {
-        $class = static::class;
+        $class = self::class;
 
         // Если в кеше уже есть нужные перечисления, то используем их
-        if (static::$resolvedEnums[$class] ?? null) {
-            return static::$resolvedEnums[$class];
+        if (self::$resolvedEnums[$class] ?? null) {
+            return self::$resolvedEnums[$class];
         }
 
-        $reflection = new \ReflectionClass(static::class);
+        $reflection = new \ReflectionClass(self::class);
         $reflectionConstants = $reflection->getReflectionConstants();
         $constants = [];
 
         // Получаем только те константы, у которых нет #[NotEnum]
         foreach ($reflectionConstants as $key => $constant) {
-            if ($constant->getDocComment() && strpos($constant->getDocComment(), '#[NotEnum]') !== false) {
+            if ($constant->getDocComment() && str_contains($constant->getDocComment(), '#[NotEnum]')) {
                 continue;
             }
 
@@ -126,7 +126,7 @@ abstract class Enumeration
         }
 
         // Кешируем полученные значения
-        static::$resolvedEnums[$class] = $constants;
+        self::$resolvedEnums[$class] = $constants;
 
         return $constants;
     }

@@ -36,7 +36,7 @@ class User extends BaseEntity implements UserInterface, PasswordAuthenticatedUse
     private ?string $password = null;
 
     #[ORM\Column]
-    private ?string $fullName;
+    private ?string $fullName = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $birthDate;

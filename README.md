@@ -76,3 +76,10 @@ Json schema по пути:
 ```bash
 http://localhost/api/doc.json
 ```
+
+Для запуска phpstan:
+```bash
+make stop-prod #если запущен прод. режим, если нет, пропустить команду
+make build-start #или make start если запускаете не первый раз
+make phpstan
+```

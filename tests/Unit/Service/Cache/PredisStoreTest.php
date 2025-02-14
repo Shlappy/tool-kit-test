@@ -21,7 +21,7 @@ final class PredisStoreTest extends UnitTestCase
     }
 
     /**
-     * Методы put и гет работают и возвращают верные значения
+     * Методы put и get работают и возвращают верные значения
      */
     public function testPutAndGetWork(): void
     {

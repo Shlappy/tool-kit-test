@@ -107,6 +107,9 @@ class Statement extends BaseEntity
         return $this;
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     public function getType(): ?array
     {
         return $this->typeId

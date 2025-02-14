@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Enum\Roles;
 use App\Form\Type\LoginFormType;
 use App\Form\Type\RegistrationFormType;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Attribute\Security as OASecurity;
 use OpenApi\Attributes as OA;
@@ -101,6 +102,7 @@ class AuthController extends BaseController
             $plainPassword = $form->get('plainPassword')->getData();
             $userData = $form->getData();
 
+            /** @var UserRepository $repository */
             $repository = $entityManager->getRepository(User::class);
             $user = $repository->findOneByField('email', $userData['email']);
 

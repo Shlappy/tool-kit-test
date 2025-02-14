@@ -74,9 +74,9 @@ final class StatementPagination
     /**
      * Данные запроса с пагинацией напрямую из БД, без кеширования результата запроса
      *
-     * @return array|null
+     * @return array
      */
-    private function fetchData(): ?array
+    private function fetchData(): array
     {
         $builder = $this->entityManager
             ->getRepository(Statement::class)

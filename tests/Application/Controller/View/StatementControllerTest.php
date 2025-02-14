@@ -127,7 +127,6 @@ final class StatementControllerTest extends ApplicationTestCase
         $firstClient = $userRepository->findOneBy(['email' => 'client1@test.ru']);
         $secondClient = $userRepository->findOneBy(['email' => 'client2@test.ru']);
 
-        /** @var Statement $lastStatement */
         $firstClientStatements = $entityManager->createQueryBuilder()
             ->select('COUNT(s) AS count')
             ->from(Statement::class, 's')
@@ -139,7 +138,6 @@ final class StatementControllerTest extends ApplicationTestCase
         // У первого клиента 3 заявления в БД
         $this->assertEquals(3, $firstClientStatements);
 
-        /** @var Statement $lastStatement */
         $secondClientStatements = $entityManager->createQueryBuilder()
             ->select('COUNT(s) AS count')
             ->from(Statement::class, 's')

@@ -4,6 +4,7 @@ namespace App\Controller\View;
 
 use App\Controller\BaseController;
 use App\Entity\Statement;
+use App\Entity\User;
 use App\Enum\CacheKeys;
 use App\Form\Type\StatementCreateType;
 use App\Service\FileUploader;
@@ -47,12 +48,13 @@ class StatementController extends BaseController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            /** @var UploadedFile $uploadedFile */
             if ($uploadedFile = $form->get('file')->getData()) {
                 $statement->setFile($fileUploader->upload($uploadedFile));
             }
 
-            $statement->setCreator($this->getUser());
+            /** @var User $user */
+            $user = $this->getUser();
+            $statement->setCreator($user);
             $entityManager->persist($statement);
             $entityManager->flush();
 
@@ -79,10 +81,12 @@ class StatementController extends BaseController
         StatementPagination $statementPagination
     ): Response
     {
+        /** @var User $user */
+        $user = $this->getUser();
         $page = (int)$request->get('page');
         $statementPagination
             ->init('statement_list', $page)
-            ->setUser($this->getUser());
+            ->setUser($user);
 
         return $this->render('views/statement/list.html.twig', [
             'statements' => $statementPagination->getResult()['items'],
