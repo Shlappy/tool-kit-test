@@ -18,18 +18,16 @@ class StatementFixtures extends Fixture implements DependentFixtureInterface, Fi
 {
     use FakeGenerator;
 
-    private CONST UPLOAD_PATH = __DIR__ . '/../../../var/uploads';
+    private CONST string UPLOAD_PATH = __DIR__ . '/../../../var/uploads';
 
     public function load(ObjectManager $manager): void
     {
         // Удаляем папку загрузок, если есть, и создаём новую
         $filesystem = new Filesystem;
-        if (!is_dir(self::UPLOAD_PATH)) {
+        if (is_dir(self::UPLOAD_PATH)) {
             $filesystem->remove(self::UPLOAD_PATH);
-            $filesystem->mkdir(self::UPLOAD_PATH);
-        } else {
-            $filesystem->mkdir(self::UPLOAD_PATH);
         }
+        $filesystem->mkdir(self::UPLOAD_PATH);
 
         foreach ($this->getStatementData() as [$number, $date, $fullName, $comment, $phone, $typeId, $creator, $file]) {
             $statement = new Statement;

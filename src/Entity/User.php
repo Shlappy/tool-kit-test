@@ -30,7 +30,7 @@ class User extends BaseEntity implements UserInterface, PasswordAuthenticatedUse
     private array $roles = [];
 
     /**
-     * @var string The hashed password
+     * @var string|null The hashed password
      */
     #[ORM\Column]
     private ?string $password = null;
@@ -39,7 +39,7 @@ class User extends BaseEntity implements UserInterface, PasswordAuthenticatedUse
     private ?string $fullName;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    private ?\DateTime $birthDate;
+    private ?\DateTimeInterface $birthDate;
 
     #[ORM\Column(nullable: true)]
     private ?string $address;
@@ -157,19 +157,19 @@ class User extends BaseEntity implements UserInterface, PasswordAuthenticatedUse
         return $this;
     }
 
-    public function getFullName(): string
+    public function getFullName(): ?string
     {
         return $this->fullName;
     }
 
-    public function setBirthDate(?\DateTime $birthDate): static
+    public function setBirthDate(?\DateTimeInterface $birthDate): static
     {
         $this->birthDate = $birthDate;
 
         return $this;
     }
 
-    public function getBirthDate(): \DateTime
+    public function getBirthDate(): ?\DateTimeInterface
     {
         return $this->birthDate;
     }
@@ -181,7 +181,7 @@ class User extends BaseEntity implements UserInterface, PasswordAuthenticatedUse
         return $this;
     }
 
-    public function getAddress(): string
+    public function getAddress(): ?string
     {
         return $this->address;
     }
@@ -193,7 +193,7 @@ class User extends BaseEntity implements UserInterface, PasswordAuthenticatedUse
         return $this;
     }
 
-    public function getPhone(): string
+    public function getPhone(): ?string
     {
         return $this->phone;
     }

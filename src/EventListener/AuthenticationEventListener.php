@@ -10,7 +10,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * Слушатель для событий аутентификации
  */
-final class AuthenticationEventListener
+readonly class AuthenticationEventListener
 {
     public function __construct(private RouterInterface $router)
     {

@@ -17,7 +17,7 @@ class PredisStore implements AppCacheInterface
     }
 
     /**
-     * Возвращает значение и, если его нет в кеше, запонимает его на укзанное время
+     * Возвращает значение и, если его нет в кеше, запоминает его на укзанное время
      *
      * @param string $key
      * @param int|null $seconds Время в секундах

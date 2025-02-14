@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Form;
+namespace App\Form\Type;
 
 use App\Entity\Statement;
 use App\Entity\User;
 use App\Enum\Custom\StatementTypes;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -19,14 +18,10 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class StatementCreateType extends AbstractType
 {
-    public function __construct(private Security $security)
-    {
-    }
-
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         /** @var User $user */
-        $user = $this->security->getUser();
+        $user = $options['user'];
 
         $builder
             ->add('number', null, [
@@ -134,6 +129,7 @@ class StatementCreateType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Statement::class,
+            'user' => null
         ]);
     }
 }

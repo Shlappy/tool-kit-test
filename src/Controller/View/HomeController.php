@@ -3,6 +3,7 @@
 namespace App\Controller\View;
 
 use App\Controller\BaseController;
+use Symfony\Component\Form\Util\StringUtil;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 

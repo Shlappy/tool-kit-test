@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Abstractions\Common;
+namespace App\Enum\Custom;
 
 /**
  * Класс для перечислений, предоставляющий

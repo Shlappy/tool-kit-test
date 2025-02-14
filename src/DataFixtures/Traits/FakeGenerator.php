@@ -6,7 +6,7 @@ use DateTime;
 
 trait FakeGenerator
 {
-    private function randomDateInRange(DateTime $start, DateTime $end)
+    private function randomDateInRange(DateTime $start, DateTime $end): DateTime
     {
         $randomTimestamp = mt_rand($start->getTimestamp(), $end->getTimestamp());
         $randomDate = new DateTime();
@@ -23,7 +23,7 @@ trait FakeGenerator
 
     private function randomPhone(): string
     {
-        return '+' . (string)mt_rand(700000000, 999999999);
+        return '+' . mt_rand(700000000, 999999999);
     }
 
     /**

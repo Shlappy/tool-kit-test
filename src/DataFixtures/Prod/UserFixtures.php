@@ -45,9 +45,15 @@ class UserFixtures extends Fixture implements FixtureGroupInterface
                 [Roles::ADMIN->value],
             ],
             [
-                'Клиент Клиентов Клиентович',
+                'Первый Клиентов Клиентович',
                 '12345678',
                 'client@test.ru',
+                [Roles::CLIENT->value],
+            ],
+            [
+                'Второй Клиентов Клиентович',
+                '12345678',
+                'client2@test.ru',
                 [Roles::CLIENT->value],
             ],
         ];

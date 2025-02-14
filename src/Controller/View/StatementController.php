@@ -5,7 +5,7 @@ namespace App\Controller\View;
 use App\Controller\BaseController;
 use App\Entity\Statement;
 use App\Enum\CacheKeys;
-use App\Form\StatementCreateType;
+use App\Form\Type\StatementCreateType;
 use App\Service\FileUploader;
 use App\Service\Pagination\StatementPagination;
 use Doctrine\ORM\EntityManagerInterface;
@@ -41,7 +41,9 @@ class StatementController extends BaseController
     ): Response
     {
         $statement = new Statement;
-        $form = $this->createForm(StatementCreateType::class, $statement);
+        $form = $this->createForm(StatementCreateType::class, $statement, [
+            'user' => $this->getUser()
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

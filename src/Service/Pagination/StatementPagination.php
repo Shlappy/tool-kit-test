@@ -5,8 +5,6 @@ namespace App\Service\Pagination;
 use App\Entity\Statement;
 use App\Entity\User;
 use App\Service\Cache\AppCacheInterface;
-use App\Service\Pagination\PagePaginator;
-use App\Service\Pagination\PaginationLinks;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -59,10 +57,10 @@ final class StatementPagination
 
     /**
      * Данные запроса с пагинацией с кешированием результата запроса
-
-     * @return array
+     *
+     * @return array|null
      */
-    public function getResult(): array
+    public function getResult(): ?array
     {
         if ($this->shouldCache) {
             $this->paginatedResult = $this->getFromCache();
@@ -76,9 +74,9 @@ final class StatementPagination
     /**
      * Данные запроса с пагинацией напрямую из БД, без кеширования результата запроса
      *
-     * @return array
+     * @return array|null
      */
-    private function fetchData(): array
+    private function fetchData(): ?array
     {
         $builder = $this->entityManager
             ->getRepository(Statement::class)
@@ -109,9 +107,9 @@ final class StatementPagination
     /**
      * Возвращает закешированный результат
      *
-     * @return array
+     * @return array|null
      */
-    public function getFromCache(): array
+    public function getFromCache(): ?array
     {
         $key = "$this->cacheKey:$this->page";
         $ttl = $this->cacheTimeInMin * 60;
@@ -126,9 +124,9 @@ final class StatementPagination
      *
      * @param string $key Ключ для кеширования
      * @param int $timeInMin Время в минутах
-     * @return static
+     * @return StatementPagination
      */
-    public function setCache(string $key, int $timeInMin = 5): static
+    public function setCache(string $key, int $timeInMin = 5): StatementPagination
     {
         $this->cacheKey = $key;
         $this->cacheTimeInMin = $timeInMin;
@@ -141,9 +139,9 @@ final class StatementPagination
      * Задать пользователя, заявления которого будут отображены
      *
      * @param User|null $user
-     * @return string
+     * @return StatementPagination
      */
-    public function setUser(?User $user = null): static
+    public function setUser(?User $user = null): self
     {
         $this->user = $user;
 
@@ -152,11 +150,12 @@ final class StatementPagination
 
     /**
      * Инициализация требуемых полей
-     * 
+     *
      * @param string $route
-     * @param int|null $page
+     * @param int $page
+     * @return StatementPagination
      */
-    public function init(string $route, int $page = 1): static
+    public function init(string $route, int $page = 1): self
     {
         $this->route = $route;
         $this->page = $page ?: 1;

@@ -81,6 +81,8 @@ migrate: ## Runs all migrations for main/test databases
 	@make exec cmd="php bin/console doctrine:migrations:migrate --no-interaction"
 ## @make exec cmd="php bin/console doctrine:migrations:migrate --no-interaction --env=test"
 
+test:
+	@make exec cmd="php bin/phpunit"
 
 fixtures-prod:
 	@make exec cmd="php bin/console doctrine:fixtures:load --group=prod --no-interaction"

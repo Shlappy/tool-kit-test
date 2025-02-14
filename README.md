@@ -36,6 +36,10 @@ http://localhost:port
 Логин - client@test.ru<br>
 Пароль - 12345678
 
+#### Для входа за второго клиента:
+Логин - client2@test.ru<br>
+Пароль - 12345678
+
 ---
 ### Справка
 Для остановки всех контейнеров:
@@ -50,9 +54,25 @@ make start-prod
 
 Для накатывания фикстур dev-режима:<br>! После этого все старые данные в БД будут удалены !
 ```bash
-make fixtures-prod
+make fixtures-dev
 ```
 Для накатывания фикстур prod-режима (по умолчанию):<br>! После этого все старые данные в БД будут удалены !
 ```bash
-make fixtures-dev
+make fixtures-prod
+```
+
+Для запуска тестов:
+```bash
+make stop-prod #если запущен прод. режим, если нет, пропустить команду
+make build-start #или make start если запускаете не первый раз
+make test
+```
+
+Swagger документация по пути:
+```bash
+http://localhost/api/doc
+```
+Json schema по пути:
+```bash
+http://localhost/api/doc.json
 ```

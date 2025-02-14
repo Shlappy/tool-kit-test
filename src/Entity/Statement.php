@@ -6,7 +6,6 @@ use App\Enum\Custom\StatementTypes;
 use App\Repository\StatementRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Filesystem\Filesystem;
 
 #[ORM\Entity(repositoryClass: StatementRepository::class)]
 class Statement extends BaseEntity
@@ -125,11 +124,6 @@ class Statement extends BaseEntity
         $this->creator = $creator;
 
         return $this;
-    }
-
-    public function getCreatorId(): ?int
-    {
-        return $this->creator;
     }
 
     public function getFile(): ?File
