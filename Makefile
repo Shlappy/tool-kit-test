@@ -102,6 +102,12 @@ else
 	@make exec cmd="make phpstan"
 endif
 
+phpcs: ## Runs PHP CodeSniffer
+	@make exec-bash cmd="./vendor/bin/phpcs --version && ./vendor/bin/phpcs --standard=PSR12 --colors -p src tests"
+
+phpcs-fix:
+	@make exec-bash cmd="./vendor/bin/php-cs-fixer fix src tests"
+
 exec-bash:
 ifeq ($(INSIDE_DOCKER_CONTAINER), 1)
 	@bash -c "$(cmd)"
