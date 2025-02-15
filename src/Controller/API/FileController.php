@@ -47,6 +47,11 @@ class FileController extends BaseController
             throw $this->createNotFoundException('Файл не найден');
         }
 
+        // Если файл был удалён на сервере
+        if (!is_file(__DIR__  . '/../../../var/uploads/'. $file->getName())) {
+            throw $this->createNotFoundException('Файл не найден');
+        }
+
         return $this->file('var/uploads/'. $file->getName());
     }
 }

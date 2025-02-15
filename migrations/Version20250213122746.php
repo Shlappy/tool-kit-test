@@ -5,6 +5,7 @@ declare(strict_types=1);
 // phpcs:ignoreFile
 namespace DoctrineMigrations;
 
+use App\Enum\Roles;
 use Doctrine\DBAL\Platforms\PostgreSQL120Platform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
@@ -50,6 +51,37 @@ final class Version20250213122746 extends AbstractMigration
         $this->addSql('ALTER TABLE file ADD CONSTRAINT FK_8C9F361061220EA6 FOREIGN KEY (creator_id) REFERENCES "user" (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE statement ADD CONSTRAINT FK_C0DB517661220EA6 FOREIGN KEY (creator_id) REFERENCES "user" (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE statement ADD CONSTRAINT FK_C0DB517693CB796C FOREIGN KEY (file_id) REFERENCES file (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+
+        if ('test' !== $_ENV['APP_ENV']) {
+            $usersData = [
+                [
+                    'Админ Админов Админович',
+                    '$2a$12$fJonnEY4W9QTF148I3aUD.1fjXKw05ASVGIbYxrp9h9Zq/mklj9/K',
+                    'admin@test.ru',
+                    Roles::ADMIN->value,
+                ],
+                [
+                    'Первый Клиентов Клиентович',
+                    '$2a$12$fJonnEY4W9QTF148I3aUD.1fjXKw05ASVGIbYxrp9h9Zq/mklj9/K',
+                    'client@test.ru',
+                    Roles::CLIENT->value,
+                ],
+                [
+                    'Второй Клиентов Клиентович',
+                    '$2a$12$fJonnEY4W9QTF148I3aUD.1fjXKw05ASVGIbYxrp9h9Zq/mklj9/K',
+                    'client2@test.ru',
+                    Roles::CLIENT->value,
+                ],
+            ];
+
+            $values = [];
+            foreach ($usersData as $userData) {
+                $values[] = "(nextval('user_id_seq'),'$userData[0]','$userData[1]','$userData[2]','[\"" . $userData[3] . "\"]')";
+            }
+            $values = implode(',', $values);
+
+            $this->addSql("INSERT INTO \"user\" (id, full_name, password, email, roles) VALUES $values");
+        }
     }
 
     /**

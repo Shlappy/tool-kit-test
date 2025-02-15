@@ -114,7 +114,7 @@ final class StatementControllerTest extends ApplicationTestCase
         $this->authorizeAsClient($appClient, [
             'login_form' => [
                 'email' => 'client2@test.ru',
-                'plainPassword' => '12345678'
+                'plainPassword' => '123456'
             ]
         ]);
 
@@ -160,7 +160,7 @@ final class StatementControllerTest extends ApplicationTestCase
         $this->authorizeAsClient($appClient, [
             'login_form' => [
                 'email' => 'client2@test.ru',
-                'plainPassword' => '12345678'
+                'plainPassword' => '123456'
             ]
         ]);
 
@@ -210,7 +210,7 @@ final class StatementControllerTest extends ApplicationTestCase
         $this->authorizeAsClient($appClient, [
             'login_form' => [
                 'email' => 'client2@test.ru',
-                'plainPassword' => '12345678'
+                'plainPassword' => '123456'
             ]
         ]);
 

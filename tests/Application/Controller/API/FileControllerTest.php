@@ -56,7 +56,7 @@ final class FileControllerTest extends ApplicationTestCase
         $this->authorizeAsClient($appClient, [
             'login_form' => [
                 'email' => 'client2@test.ru',
-                'plainPassword' => '12345678'
+                'plainPassword' => '123456'
             ]
         ]);
         $secondClient = $userRepository->findOneBy(['email' => 'client2@test.ru']);

@@ -15,6 +15,8 @@ services:
             - ./:/var/www/html:ro,cached
         depends_on:
             - symfony
+        links:
+            - symfony
         networks:
             - symfony
 
@@ -42,11 +44,16 @@ services:
             - "${POSTGRES_PORT}:5432"
         restart: unless-stopped
         volumes:
-            - ./var/db-data:/postgresql:delegated
+            - db-data:/postgresql:delegated
         environment:
             POSTGRES_USER: ${POSTGRES_USER}
             POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
             POSTGRES_DB: ${POSTGRES_DB}
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+            interval: 5s
+            timeout: 5s
+            retries: 5
         networks:
             - symfony
 
@@ -69,7 +76,7 @@ services:
         ports:
             - "6379:6379"
         volumes:
-            - ./var/redisdata:/data
+            - redisdata:/data
         command: >
             sh -c '
                 mkdir -p /usr/local/etc/redis &&
@@ -108,3 +115,9 @@ services:
 networks:
     symfony:
         name: symfony
+
+volumes:
+    redisdata:
+        external: false
+    db-data:
+        external: false

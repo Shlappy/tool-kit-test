@@ -58,7 +58,7 @@ trait AuthTrait
         return [
             'login_form' => [
                 'email' => 'admin@test.ru',
-                'plainPassword' => '12345678'
+                'plainPassword' => '123456'
             ]
         ];
     }
@@ -68,7 +68,7 @@ trait AuthTrait
         return [
             'login_form' => [
                 'email' => 'client1@test.ru',
-                'plainPassword' => '12345678'
+                'plainPassword' => '123456'
             ]
         ];
     }

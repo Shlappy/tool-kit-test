@@ -17,7 +17,7 @@ abstract class Enumeration
      *
      * @var array
      */
-    private static array $resolvedEnums = [];
+    protected static array $resolvedEnums = [];
 
     private function __construct() {}
 
@@ -30,7 +30,7 @@ abstract class Enumeration
      */
     public static function getByArrId(int $id): array
     {
-        return self::getByArrKey('id', $id);
+        return static::getByArrKey('id', $id);
     }
 
     /**
@@ -42,7 +42,7 @@ abstract class Enumeration
      */
     public static function getByArrSlug(string $slug): array
     {
-        return self::getByArrKey('slug', $slug);
+        return static::getByArrKey('slug', $slug);
     }
 
     /**
@@ -57,7 +57,7 @@ abstract class Enumeration
      */
     public static function getByArrKey(string $key, $value): array
     {
-        $allEnums = self::getAll();
+        $allEnums = static::getAll();
 
         $arrayKey = array_search($value, array_column($allEnums, $key));
 
@@ -81,7 +81,7 @@ abstract class Enumeration
     {
         if (in_array($value, [null, ''], true)) return null;
 
-        $allEnums = self::getAll();
+        $allEnums = static::getAll();
 
         $arrayKey = array_search($value, array_column($allEnums, $key));
 
@@ -95,7 +95,7 @@ abstract class Enumeration
      */
     public static function getAllIds(): array
     {
-        return array_column(self::getAll(), 'id');
+        return array_column(static::getAll(), 'id');
     }
 
     /**
@@ -105,14 +105,14 @@ abstract class Enumeration
      */
     public static function getAll(): array
     {
-        $class = self::class;
+        $class = static::class;
 
         // Если в кеше уже есть нужные перечисления, то используем их
-        if (self::$resolvedEnums[$class] ?? null) {
-            return self::$resolvedEnums[$class];
+        if (static::$resolvedEnums[$class] ?? null) {
+            return static::$resolvedEnums[$class];
         }
 
-        $reflection = new \ReflectionClass(self::class);
+        $reflection = new \ReflectionClass(static::class);
         $reflectionConstants = $reflection->getReflectionConstants();
         $constants = [];
 
@@ -126,7 +126,7 @@ abstract class Enumeration
         }
 
         // Кешируем полученные значения
-        self::$resolvedEnums[$class] = $constants;
+        static::$resolvedEnums[$class] = $constants;
 
         return $constants;
     }

@@ -44,7 +44,7 @@ class UserFixtures extends Fixture implements FixtureGroupInterface
         return [
             [
                 'Тестовый Тестович',
-                '12345678',
+                '123456',
                 'admin@test.ru',
                 [Roles::ADMIN->value],
                 '+71234567893',
@@ -53,7 +53,7 @@ class UserFixtures extends Fixture implements FixtureGroupInterface
             ],
             [
                 'Обычный Человек',
-                '12345678',
+                '123456',
                 'client1@test.ru',
                 [Roles::CLIENT->value],
                 '+79873218763',
@@ -62,7 +62,7 @@ class UserFixtures extends Fixture implements FixtureGroupInterface
             ],
             [
                 'Игорь Безупречный Игоревич',
-                '12345678',
+                '123456',
                 'client2@test.ru',
                 [Roles::CLIENT->value],
                 '+75023847525',

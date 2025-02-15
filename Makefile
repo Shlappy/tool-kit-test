@@ -20,19 +20,22 @@ endif
 load-prod-env:
 	$(eval include .env.prod)
 
-build-start: ## Build dev environment
+build-start-dev: ## Build dev environment
 ifeq ($(INSIDE_DOCKER_CONTAINER), 0)
 	@HOST_UID=$(HOST_UID) HOST_GID=$(HOST_GID) WEB_PORT_HTTP=$(WEB_PORT_HTTP) WEB_PORT_SSL=$(WEB_PORT_SSL) POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) POSTGRES_PORT=$(POSTGRES_PORT) docker compose -f compose.yaml build
 	@HOST_UID=$(HOST_UID) HOST_GID=$(HOST_GID) WEB_PORT_HTTP=$(WEB_PORT_HTTP) WEB_PORT_SSL=$(WEB_PORT_SSL) POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) POSTGRES_PORT=$(POSTGRES_PORT) docker compose -f compose.yaml $(PROJECT_NAME) up -d
+	@make exec-bash cmd="bash ./docker/scripts/wait_for_db.sh"
 	@make exec-bash cmd="COMPOSER_MEMORY_LIMIT=-1 composer install --optimize-autoloader"
+	@make exec cmd="php bin/console doctrine:database:create --if-not-exists --env=dev --no-interaction"
 	@make initialize-program
 else
 	$(ERROR_ONLY_FOR_HOST)
 endif
 
-start: ## Start dev environment
+start-dev: ## Start dev environment
 ifeq ($(INSIDE_DOCKER_CONTAINER), 0)
 	@HOST_UID=$(HOST_UID) HOST_GID=$(HOST_GID) WEB_PORT_HTTP=$(WEB_PORT_HTTP) WEB_PORT_SSL=$(WEB_PORT_SSL) POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) POSTGRES_PORT=$(POSTGRES_PORT) docker compose -f compose.yaml $(PROJECT_NAME) up -d
+	@make exec-bash cmd="bash ./docker/scripts/wait_for_db.sh"
 	@make exec-bash cmd="COMPOSER_MEMORY_LIMIT=-1 composer install --optimize-autoloader"
 else
 	$(ERROR_ONLY_FOR_HOST)
@@ -42,9 +45,9 @@ build-start-prod: load-prod-env ## Build prod environment
 ifeq ($(INSIDE_DOCKER_CONTAINER), 0)
 	@HOST_UID=$(HOST_UID) HOST_GID=$(HOST_GID) WEB_PORT_HTTP=$(WEB_PORT_HTTP) WEB_PORT_SSL=$(WEB_PORT_SSL) POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) POSTGRES_PORT=$(POSTGRES_PORT) docker compose -f compose-prod.yaml build
 	@HOST_UID=$(HOST_UID) HOST_GID=$(HOST_GID) WEB_PORT_HTTP=$(WEB_PORT_HTTP) WEB_PORT_SSL=$(WEB_PORT_SSL) POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) POSTGRES_PORT=$(POSTGRES_PORT) docker compose -f compose-prod.yaml $(PROJECT_NAME) up -d
+	@make exec-bash cmd="bash ./docker/scripts/wait_for_db.sh"
+	@make exec cmd="php bin/console doctrine:database:create --if-not-exists --env=prod --no-interaction"
 	@make initialize-program
-	@make exec cmd="php bin/console asset-map:compile"
-	@make fixtures-prod
 else
 	$(ERROR_ONLY_FOR_HOST)
 endif
@@ -52,11 +55,12 @@ endif
 start-prod: load-prod-env ## Start prod environment
 ifeq ($(INSIDE_DOCKER_CONTAINER), 0)
 	@HOST_UID=$(HOST_UID) HOST_GID=$(HOST_GID) WEB_PORT_HTTP=$(WEB_PORT_HTTP) WEB_PORT_SSL=$(WEB_PORT_SSL) POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) POSTGRES_PORT=$(POSTGRES_PORT) docker compose -f compose-prod.yaml $(PROJECT_NAME) up -d
+	@make exec-bash cmd="bash ./docker/scripts/wait_for_db.sh"
 else
 	$(ERROR_ONLY_FOR_HOST)
 endif
 
-stop: ## Stop dev environment containers
+stop-dev: ## Stop dev environment containers
 ifeq ($(INSIDE_DOCKER_CONTAINER), 0)
 	@HOST_UID=$(HOST_UID) HOST_GID=$(HOST_GID) WEB_PORT_HTTP=$(WEB_PORT_HTTP) WEB_PORT_SSL=$(WEB_PORT_SSL) POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) POSTGRES_PORT=$(POSTGRES_PORT) docker compose -f compose.yaml $(PROJECT_NAME) stop
 else
@@ -70,12 +74,27 @@ else
 	$(ERROR_ONLY_FOR_HOST)
 endif
 
-restart: stop start ## Stop and start dev environment
+down-dev: ## Stop and remove dev environment containers, networks
+ifeq ($(INSIDE_DOCKER_CONTAINER), 0)
+	@HOST_UID=$(HOST_UID) HOST_GID=$(HOST_GID) WEB_PORT_HTTP=$(WEB_PORT_HTTP) WEB_PORT_SSL=$(WEB_PORT_SSL) POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) POSTGRES_PORT=$(POSTGRES_PORT) docker compose -f compose.yaml $(PROJECT_NAME) down
+else
+	$(ERROR_ONLY_FOR_HOST)
+endif
+
+down-prod: ## Stop and remove prod environment containers, networks
+ifeq ($(INSIDE_DOCKER_CONTAINER), 0)
+	@HOST_UID=$(HOST_UID) HOST_GID=$(HOST_GID) WEB_PORT_HTTP=$(WEB_PORT_HTTP) WEB_PORT_SSL=$(WEB_PORT_SSL) POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) POSTGRES_PORT=$(POSTGRES_PORT) docker compose -f compose-prod.yaml $(PROJECT_NAME) down
+else
+	$(ERROR_ONLY_FOR_HOST)
+endif
+
+restart-dev: stop start ## Stop and start dev environment
 restart-prod: stop-prod start-prod ## Stop and start prod environment
 
 initialize-program: ## Initialize program by running required commands
 	@make exec cmd="php bin/console lexik:jwt:generate-keypair --skip-if-exists"
 	@make migrate
+	@make exec cmd="php bin/console asset-map:compile"
 
 migrate: ## Runs all migrations for main/test databases
 	@make exec cmd="php bin/console doctrine:migrations:migrate --no-interaction"
@@ -84,13 +103,8 @@ migrate: ## Runs all migrations for main/test databases
 test:
 	@make exec cmd="php bin/phpunit"
 
-fixtures-prod:
-	@make exec cmd="php bin/console doctrine:fixtures:load --group=prod --no-interaction"
 fixtures-dev:
 	@make exec cmd="php bin/console doctrine:fixtures:load --group=dev --no-interaction"
-
-phpunit: ## Runs PhpUnit tests
-	@make exec-bash cmd="rm -rf ./var/cache/test* && bin/console cache:warmup --env=test && ./vendor/bin/phpunit -c phpunit.xml.dist --coverage-html reports/coverage $(PHPUNIT_OPTIONS) --coverage-clover reports/clover.xml --log-junit reports/junit.xml"
 
 phpstan: ## Runs PhpStan static analysis tool
 ifeq ($(INSIDE_DOCKER_CONTAINER), 1)
